@@ -12,7 +12,7 @@ on:
         type: string
       dockerfile_path:
         required: false
-        default: './Dockerfile'
+        default: 'Dockerfile'
         type: string
       context:
         required: false
