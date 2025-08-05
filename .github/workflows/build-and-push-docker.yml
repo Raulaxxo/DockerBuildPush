@@ -1,0 +1,45 @@
+name: Build and Push Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      image_tag:
+        required: false
+        default: 'latest'
+        type: string
+      dockerfile_path:
+        required: false
+        default: './Dockerfile'
+        type: string
+      context:
+        required: false
+        default: '.'
+        type: string
+    secrets:
+      REGISTRY_USERNAME:
+        required: true
+      REGISTRY_PASSWORD:
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ inputs.image_name }}:${{ inputs.image_tag }} -f ${{ inputs.dockerfile_path }} ${{ inputs.context }}
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ inputs.image_name }}:${{ inputs.image_tag }}
+
+
